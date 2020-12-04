@@ -3,9 +3,7 @@ const secret = require("../config").secret;
 
 function getTokenFromCookies(req) {
     if (req.cookies && Object.keys(req.cookies).length >= 2) {
-        console.log(`cookies: ${req.cookies}`);
         const fullToken = req.cookies.fragmentOne + "." + req.cookies.fragmentTwo;
-        console.log("fullToken: ", fullToken);
         return fullToken;
     }
     return null;
