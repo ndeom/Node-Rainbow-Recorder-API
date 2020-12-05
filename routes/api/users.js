@@ -68,14 +68,14 @@ router.post("/login", async (req, res, next) => {
             res.cookie("fragmentOne", fragmentOne, {
                 httpOnly: false,
                 expires: new Date(Date.now() + 86400000),
-                secure: true,
+                // secure: true,
                 sameSite: "none",
                 // domain: "rainbowrecorder.netlify.app",
             });
             // ! UNCOMMENT BEFORE FINISHING
             res.cookie("fragmentTwo", fragmentTwo, {
                 // httpOnly: true,
-                secure: true,
+                // secure: true,
                 sameSite: "none",
                 // domain: "rainbowrecorder.netlify.app",
             });
