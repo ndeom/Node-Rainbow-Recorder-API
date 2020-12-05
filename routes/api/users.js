@@ -67,12 +67,12 @@ router.post("/login", async (req, res, next) => {
             const [fragmentOne, fragmentTwo] = splitToken(token);
             res.cookie("fragmentOne", fragmentOne, {
                 expires: new Date(Date.now() + 86400000), // expires after 1 day
-                // secure: true,
+                secure: true,
                 // ! UNCOMMENT BEFORE FINISHING
             });
             res.cookie("fragmentTwo", fragmentTwo, {
                 httpOnly: true,
-                // secure: true,
+                secure: true,
                 // ! UNCOMMENT BEFORE FINISHING
             });
             return res.status(200).json({ message: "User successfully logged in." });
