@@ -10,7 +10,7 @@ const app = express();
 app.use(express.urlencoded({ extended: false, limit: "10mb" }));
 app.use(express.json({ limit: "10mb" }));
 app.use(cookieParser());
-app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
+app.use(cors({ credentials: true, origin: "https://www.rainbowrecorder.netlify.app" }));
 
 app.use(require("./routes"));
 
