@@ -66,6 +66,7 @@ router.post("/login", async (req, res, next) => {
             );
             const [fragmentOne, fragmentTwo] = splitToken(token);
             res.cookie("fragmentOne", fragmentOne, {
+                httpOnly: false,
                 expires: new Date(Date.now() + 86400000),
                 secure: true,
                 sameSite: "none",
