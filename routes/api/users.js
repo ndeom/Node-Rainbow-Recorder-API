@@ -66,17 +66,17 @@ router.post("/login", async (req, res, next) => {
             );
             const [fragmentOne, fragmentTwo] = splitToken(token);
             res.cookie("fragmentOne", fragmentOne, {
-                // httpOnly: false,
+                httpOnly: false,
                 expires: new Date(Date.now() + 86400000),
-                // secure: true,
-                // sameSite: "none",
+                secure: true,
+                sameSite: "none",
                 // domain: "rainbowrecorder.netlify.app",
             });
             // ! UNCOMMENT BEFORE FINISHING
             res.cookie("fragmentTwo", fragmentTwo, {
-                // httpOnly: true,
-                // secure: true,
-                // sameSite: "none",
+                httpOnly: true,
+                secure: true,
+                sameSite: "none",
                 // domain: "rainbowrecorder.netlify.app",
             });
             // ! UNCOMMENT BEFORE FINISHING
