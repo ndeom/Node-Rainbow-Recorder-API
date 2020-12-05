@@ -73,6 +73,7 @@ router.post("/login", async (req, res, next) => {
             // ! UNCOMMENT BEFORE FINISHING
             res.cookie("fragmentTwo", fragmentTwo, {
                 httpOnly: true,
+                secure: true,
                 sameSite: "none",
             });
             // ! UNCOMMENT BEFORE FINISHING
