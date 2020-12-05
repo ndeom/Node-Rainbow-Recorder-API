@@ -70,14 +70,14 @@ router.post("/login", async (req, res, next) => {
                 expires: new Date(Date.now() + 86400000),
                 secure: true,
                 sameSite: "none",
-                // domain: "rainbowrecorder.netlify.app",
+                domain: ".netlify.app",
             });
             // ! UNCOMMENT BEFORE FINISHING
             res.cookie("fragmentTwo", fragmentTwo, {
                 httpOnly: true,
                 secure: true,
                 sameSite: "none",
-                // domain: "rainbowrecorder.netlify.app",
+                domain: ".netlify.app",
             });
             // ! UNCOMMENT BEFORE FINISHING
             return res.status(200).json({ message: "User successfully logged in." });
