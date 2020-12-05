@@ -3,7 +3,6 @@ const awsConfig = require("../config/awsconfig");
 const s3 = new S3(awsConfig);
 
 const splitToken = (token) => {
-    if (!token) throw Error("Token is undefined");
     let split = token.split(".");
     let fragmentOne = split.slice(0, 2).join(".");
     let fragmentTwo = split[2];
