@@ -50,8 +50,6 @@ router.post("/login", async (req, res, next) => {
         const user = response.rows[0];
         const match = await bcrypt.compare(password, user.hash);
         if (match) {
-            console.log("user: ", user);
-            // Change before finalzing app
             const token = jwt.sign(
                 {
                     user_id: user.user_id,
@@ -64,23 +62,15 @@ router.post("/login", async (req, res, next) => {
                     expiresIn: "7d",
                 }
             );
-            const [fragmentOne, fragmentTwo] = splitToken(token);
-            res.cookie("fragmentOne", fragmentOne, {
-                httpOnly: false,
-                expires: new Date(Date.now() + 86400000),
-                secure: true,
-                sameSite: "none",
-                domain: ".netlify.app",
-            });
-            // ! UNCOMMENT BEFORE FINISHING
-            res.cookie("fragmentTwo", fragmentTwo, {
-                httpOnly: true,
-                secure: true,
-                sameSite: "none",
-                domain: ".netlify.app",
-            });
-            // ! UNCOMMENT BEFORE FINISHING
-            return res.status(200).json({ message: "User successfully logged in." });
+            const userInfo = {
+                user_id: user.user_id,
+                username: user.username,
+                profilePicture: user.profile_picture,
+                screenName: user.screen_name,
+            };
+            return res
+                .status(200)
+                .json({ message: "User successfully logged in.", userInfo, token });
         } else {
             return res.status(401).json({
                 error: "Password did not match. Please try again.",
@@ -111,7 +101,6 @@ router.post("/register", async (req, res, next) => {
         const userID = shortid.generate();
         const hash = await bcrypt.hash(password, saltRounds);
         await client.query("INSERT INTO main.users VALUES ($1,$2,$3)", [username, hash, userID]);
-        // Change before finalzing app
         const token = jwt.sign(
             {
                 user_id: userID,
@@ -124,18 +113,13 @@ router.post("/register", async (req, res, next) => {
                 expiresIn: "7d",
             }
         );
-        const [fragmentOne, fragmentTwo] = splitToken(token);
-        res.cookie("fragmentOne", fragmentOne, {
-            expires: new Date(Date.now() + 1800000),
-            // secure: true,
-            // UNCOMMENT BEFORE FINISHING
-        });
-        res.cookie("fragmentTwo", fragmentTwo, {
-            httpOnly: true,
-            // secure: true,
-            // UNCOMMENT BEFORE FINISHING
-        });
-        return res.status(200).json({ message: "User successfully registered." });
+        const userInfo = {
+            user_id: userID,
+            username: username,
+            profilePicture: null,
+            screenName: null,
+        };
+        return res.status(200).json({ message: "User successfully registered.", userInfo, token });
     } catch (err) {
         console.error("Error while trying to insert new user: ", err.stack);
         next(err);
@@ -171,18 +155,13 @@ router.post("/refresh", async (req, res, next) => {
                 expiresIn: "7d",
             }
         );
-        const [fragmentOne, fragmentTwo] = splitToken(token);
-        res.cookie("fragmentOne", fragmentOne, {
-            expires: new Date(Date.now() + 86400000), // expires after 1 day
-            // secure: true,
-            // UNCOMMENT BEFORE FINISHING
-        });
-        res.cookie("fragmentTwo", fragmentTwo, {
-            httpOnly: true,
-            // secure: true,
-            // UNCOMMENT BEFORE FINISHING
-        });
-        return res.status(200).json({ message: "User successfully logged in." });
+        const userInfo = {
+            user_id: user.user_id,
+            username: user.username,
+            profilePicture: user.profile_picture,
+            screenName: user.screen_name,
+        };
+        return res.status(200).json({ message: "User successfully logged in.", userInfo, token });
     } catch (err) {
         console.error("Error while trying to refresh token", err.stack);
         next(err);

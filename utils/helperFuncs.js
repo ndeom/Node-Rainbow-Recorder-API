@@ -2,6 +2,7 @@ const S3 = require("aws-sdk/clients/s3");
 const awsConfig = require("../config/awsconfig");
 const s3 = new S3(awsConfig);
 
+// ? May need to remove after converting to regular token config
 const splitToken = (token) => {
     let split = token.split(".");
     let fragmentOne = split.slice(0, 2).join(".");
