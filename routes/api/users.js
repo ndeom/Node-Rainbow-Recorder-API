@@ -183,7 +183,14 @@ router.put("/username", auth.required, async (req, res, next) => {
             WHERE user_id = $2
         `;
         await client.query(query, [newUsername, userID]);
-        return res.status(200).json({ message: "Username sucessfully updated" });
+        const newQuery = `
+            SELECT user_id, username, profile_picture, screen_name
+            FROM main.users
+            WHERE user_id = $1
+        `;
+        const response = client.query(newQuery, [userID]);
+        const userInfo = response.rows[0];
+        return res.status(200).json({ message: "Username sucessfully updated", userInfo });
     } catch (err) {
         console.error("Error while changing username: ", err.stack);
         next(err);

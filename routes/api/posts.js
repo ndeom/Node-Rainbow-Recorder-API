@@ -19,34 +19,72 @@ router.get("/", auth.required, async (req, res, next) => {
     const client = await pool.connect();
     try {
         const { n, s, w, e } = req.query;
+        // const query = `
+        //     SELECT
+        //         post_id,
+        //         username,
+        //         timestamp,
+        //         ST_AsGeoJSON(location) as location_point,
+        //         image,
+        //         caption,
+        //         user_id,
+        //         (
+        // 			SELECT json_agg(
+        // 				json_build_object(
+        // 					'username', username,
+        // 					'comment', comment,
+        // 					'comment_id', comment_id,
+        //                     'post_id', post_id,
+        //                     'timestamp', timestamp
+        // 				)
+        // 			)
+        // 			FROM main.comments
+        // 			WHERE main.comments.post_id = main.posts.post_id
+        // 		) as comments,
+        // 		(
+        // 			SELECT json_build_object(user_id, post_id)
+        // 			FROM main.likes
+        //             WHERE main.likes.post_id = main.posts.post_id
+        // 		) as likes
+        //     FROM main.posts
+        //     WHERE ST_Covers(
+        //         ST_MakeEnvelope($1, $2, $3, $4, 4326),
+        //         main.posts.location
+        //     )
+        // `;
+
         const query = `
             SELECT 
-                post_id, 
-                username,  
-                timestamp, 
-                ST_AsGeoJSON(location) as location_point, 
-                image, 
-                caption, 
-                user_id,
-                (
-					SELECT json_agg(
-						json_build_object(
-							'username', username,
-							'comment', comment,
-							'comment_id', comment_id,
-                            'post_id', post_id,
-                            'timestamp', timestamp
-						)
-					)
-					FROM main.comments
-					WHERE main.comments.post_id = main.posts.post_id
-				) as comments,
-				(
-					SELECT json_build_object(user_id, post_id)
-					FROM main.likes
-                    WHERE main.likes.post_id = main.posts.post_id
-				) as likes
+                main.posts.post_id, 
+                main.posts.username,  
+                main.posts.timestamp, 
+                ST_AsGeoJSON(main.posts.location) as location_point, 
+                main.posts.image, 
+                main.posts.caption, 
+                main.posts.user_id,
+                com.comments,
+                l.likes
             FROM main.posts
+            LEFT JOIN (
+                SELECT post_id, json_agg(
+                    json_build_object(
+                        'username', username,
+                        'comment', comment,
+                        'comment_id', comment_id,
+                        'post_id', post_id,
+                        'timestamp', timestamp
+                    )
+                ) as comments
+                FROM main.comments
+                GROUP BY post_id
+            ) as com
+            ON (main.posts.post_id = com.post_id)
+            LEFT JOIN (
+                SELECT post_id, json_object_agg(user_id, post_id) as likes
+                FROM main.likes
+                GROUP BY post_id
+            ) as l
+            ON (main.posts.post_id = l.post_id)
             WHERE ST_Covers(
                 ST_MakeEnvelope($1, $2, $3, $4, 4326),
                 main.posts.location
@@ -68,35 +106,69 @@ router.get("/singlepost", auth.required, async (req, res, next) => {
     const client = await pool.connect();
     try {
         const { postID } = req.query;
+        // const query = `
+        //     SELECT
+        //         post_id,
+        //         username,
+        //         timestamp,
+        //         ST_AsGeoJSON(location) as location_point,
+        //         image,
+        //         caption,
+        //         user_id,
+        //         (
+        // 			SELECT json_agg(
+        // 				json_build_object(
+        // 					'username', username,
+        // 					'comment', comment,
+        // 					'comment_id', comment_id,
+        //                     'post_id', post_id,
+        //                     'timestamp', timestamp
+        // 				)
+        // 			)
+        // 			FROM main.comments
+        // 			WHERE main.comments.post_id = main.posts.post_id
+        // 		) as comments,
+        // 		(
+        // 			SELECT json_build_object(user_id, post_id)
+        // 			FROM main.likes
+        //             WHERE main.likes.post_id = main.posts.post_id
+        // 		) as likes
+        //     FROM main.posts
+        //     WHERE post_id = $1
+        // `;
         const query = `
             SELECT 
-                post_id, 
-                username,  
-                timestamp, 
-                ST_AsGeoJSON(location) as location_point, 
-                image, 
-                caption, 
-                user_id,
-                (
-					SELECT json_agg(
-						json_build_object(
-							'username', username,
-							'comment', comment,
-							'comment_id', comment_id,
-                            'post_id', post_id,
-                            'timestamp', timestamp
-						)
-					)
-					FROM main.comments
-					WHERE main.comments.post_id = main.posts.post_id
-				) as comments,
-				(
-					SELECT json_build_object(user_id, post_id)
-					FROM main.likes
-                    WHERE main.likes.post_id = main.posts.post_id
-				) as likes
+                main.posts.post_id, 
+                main.posts.username,  
+                main.posts.timestamp, 
+                ST_AsGeoJSON(main.posts.location) as location_point, 
+                main.posts.image, 
+                main.posts.caption, 
+                main.posts.user_id,
+                com.comments,
+                l.likes
             FROM main.posts
-            WHERE post_id = $1
+            LEFT JOIN (
+                SELECT post_id, json_agg(
+                    json_build_object(
+                        'username', username,
+                        'comment', comment,
+                        'comment_id', comment_id,
+                        'post_id', post_id,
+                        'timestamp', timestamp
+                    )
+                ) as comments
+                FROM main.comments
+                GROUP BY post_id
+            ) as com
+            ON (main.posts.post_id = com.post_id)
+            LEFT JOIN (
+                SELECT post_id, json_object_agg(user_id, post_id) as likes
+                FROM main.likes
+                GROUP BY post_id
+            ) as l
+            ON (main.posts.post_id = l.post_id)
+            WHERE main.posts.post_id = $1
         `;
         const response = await client.query(query, [postID]);
         const post = response.rows[0];
