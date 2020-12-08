@@ -1,4 +1,5 @@
 const S3 = require("aws-sdk/clients/s3");
+const fs = require("fs");
 const awsConfig = require("../config/awsconfig");
 const s3 = new S3(awsConfig);
 
@@ -54,6 +55,39 @@ const uploadImage = (path, buffer) => {
     });
 };
 
+const deleteImages = (objects) => {
+    const params = {
+        Bucket: process.env.AWS_ARN_2,
+        Delete: {
+            Objects: objects.map((object) => ({
+                Key: object.image.replace("https://post-photos.s3.us-east-2.amazonaws.com/", ""),
+            })),
+        },
+    };
+    return new Promise((resolve, reject) => {
+        s3.deleteObjects(params, (s3Err, data) => {
+            if (s3Err) {
+                reject(s3Err);
+            } else {
+                console.log("successfully removed images with result: ", data);
+                resolve(data);
+            }
+        });
+    });
+};
+
+const writeFile = (json) => {
+    return new Promise((resolve, reject) => {
+        fs.writeFile("../sample_posts/posts.json", json, (err) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve();
+            }
+        });
+    });
+};
+
 module.exports = {
     splitToken: splitToken,
     createUserToken: createUserToken,
@@ -61,4 +95,6 @@ module.exports = {
     getImgUrl: getImgUrl,
     getPoint: getPoint,
     uploadImage: uploadImage,
+    deleteImages: deleteImages,
+    writeFile: writeFile,
 };

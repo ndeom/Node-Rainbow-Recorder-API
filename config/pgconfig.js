@@ -1,3 +1,4 @@
+require("dotenv").config({ path: "../.env" });
 module.exports = {
     host: process.env.PGHOST,
     port: process.env.PGPORT,

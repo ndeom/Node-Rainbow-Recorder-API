@@ -5,7 +5,9 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "start": "node app.js",
+    "deletePosts": "node cron_jobs/deletePosts.js",
+    "addPosts": "node cron_jobs/addPosts.js"
   },
   "author": "Nick Deom",
   "license": "ISC",
